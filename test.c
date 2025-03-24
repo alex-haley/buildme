@@ -1,7 +1,10 @@
 #include "buildme.c"
+#include <stdio.h>
 
 void debug_build()
 {
+    printf("debug build\n");
+    
     first.compiler_flags = "-Od -Oi -Z7 -Wno-writable-strings";
     first.linker_flags = "";
 
@@ -10,6 +13,8 @@ void debug_build()
 
 void release_build()
 {
+    printf("release build\n");
+    
     first.compiler_flags = "-O2 -Wno-writable-strings";
     first.linker_flags = "";
     
@@ -24,20 +29,23 @@ int scmp(char *a, char *b)
 }
 
 int main(int argc, char **argv)
-{
-    if (argc < 2) {
-	system("echo \"usage: test [-debug|-release]\"");
-    }
-
+{    
     first.input_path = "hello.c";
     first.output_path = "hello.exe";
+    first.run_flag = 0;
+
+    if (argc < 2) {
+	debug_build();
+    }
 
     if (scmp(argv[1], "-release")) {
-	system("echo release");
 	release_build();
     }
     if (scmp(argv[1], "-debug")) {
-	system("echo debug");
+	debug_build();
+    }
+    if (scmp(argv[1], "-run")) {
+	first.run_flag = 1;
 	debug_build();
     }
 

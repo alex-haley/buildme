@@ -2,6 +2,7 @@
 
 typedef struct
 {
+    char run_flag;
     char *input_path;
     char *output_path;
     char *compiler_flags;
@@ -27,12 +28,8 @@ slen(char *str)
 void
 concat(char* str1, char* str2)
 {
-    char *tmp = (char *) malloc(slen(str1) + slen(str2));
-    copy(tmp, str1);
-    char *ptr = &tmp[slen(str1)];
+    char *ptr = &str1[slen(str1)];
     copy(ptr, str2);
-    copy(str1, tmp);
-    free(tmp);
 }
 
 void
@@ -51,6 +48,10 @@ BuildProgram()
     if (slen(first.linker_flags)) {
 	concat(run_string, " /link ");
 	concat(run_string, first.linker_flags);
+    }
+    if (first.run_flag == 1) {
+	concat(run_string, " && ");
+	concat(run_string, first.output_path);
     }
 
     system(run_string);
