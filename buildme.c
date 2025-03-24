@@ -42,15 +42,19 @@ BuildProgram()
     char *run_string = (char *) malloc(1024);
 
     copy(run_string, "clang-cl ");
-    concat(run_string, first.compiler_flags);
-    concat(run_string, " ");
+    if (slen(first.compiler_flags) > 0) {
+	concat(run_string, first.compiler_flags);
+	concat(run_string, " ");
+    }
     concat(run_string, first.input_path);
     concat(run_string, " -o ");
     concat(run_string, first.output_path);
-    concat(run_string, " /link ");
-    concat(run_string, first.linker_flags);
+    if (slen(first.linker_flags) > 0) {
+	concat(run_string, " /link ");
+	concat(run_string, first.linker_flags);
+    }
 
-    printf("run string : %s\n", run_string);
+    printf("compiler command : %s\n", run_string);
     
     system(run_string);
     free(run_string);
