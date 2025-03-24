@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct
@@ -53,8 +52,6 @@ BuildProgram()
 	concat(run_string, " /link ");
 	concat(run_string, first.linker_flags);
     }
-
-    printf("compiler command : %s\n", run_string);
     
     system(run_string);
     free(run_string);
