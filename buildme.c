@@ -68,7 +68,7 @@ BuildProgram()
     }
     concat(run_string, " /out:");
     concat(run_string, first.output_path);
-    if (first.run_flag == 1) {
+    if (first.run_flag) {
 	concat(run_string, " && ");
 	concat(run_string, first.output_path);
     }
