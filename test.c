@@ -5,10 +5,10 @@ void debug_build()
 {
     printf("debug build\n");
     
-    first.compiler_flags = "-Od -Oi -Z7 -Wno-writable-strings";
-    first.linker_flags = "";
+    first.compiler_flags = "-Od -Oi -Z7";
+    first.linker_flags   = "";
 
-    BuildProgram();
+    build_program();
 }
 
 void release_build()
@@ -16,16 +16,32 @@ void release_build()
     printf("release build\n");
     
     first.compiler_flags = "-O2 -Wno-writable-strings";
-    first.linker_flags = "";
+    first.linker_flags   = "";
     
-    BuildProgram();
+    build_program();
 }
 
-int scmp(char *a, char *b)
+void custom_build()
 {
-    for (int x = 0; a[x] == b[x]; ++x)
-	if (!a[x] || ++x >= slen(a)) return 1;
-    return 0;
+    printf("custom build\n");
+
+    first.compiler_flags = "";
+    first.linker_flags   = "";
+
+    first.run_string = malloc(256);
+    first.run_string = "";
+
+    copy(first.run_string, first.compiler_flags);    
+    copy_right(first.run_string, first.input_path);
+    copy_right(first.run_string, first.linker_flags);
+    copy_right(first.run_string, " /out:");
+    copy_right(first.run_string, first.output_path);
+
+    copy_left(first.run_string, "cl ");
+    printf("%s\n", first.run_string);
+    
+    system(first.run_string);
+    free(first.run_string);
 }
 
 int main(int argc, char **argv)
@@ -47,6 +63,9 @@ int main(int argc, char **argv)
     if (scmp(argv[1], "-run")) {
 	first.run_flag = 1;
 	debug_build();
+    }
+    if (scmp(argv[1], "-custom")) {
+	custom_build();
     }
 
     return 0;

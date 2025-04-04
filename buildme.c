@@ -1,16 +1,5 @@
 #include <stdlib.h>
 
-// TODO(alex-haley): have some ideas on how to make concatinations faster
-// right now im doing a lot of string copying by character, so its O(n)
-// or even O(n2) and not really fast, so what we can do instead is to create
-// string struct that would contain string itself and integer that would
-// determine the size of that string, so when we will copy one string to
-// another, we will just copy the memory block which size we have inside
-// string struct
-// doing this will free us from always going throw each string multiple times,
-// i expect with this memory blocks we should go through each string just
-// once, to determine size of this string.
-
 typedef struct
 {
     char run_flag;
@@ -18,30 +7,11 @@ typedef struct
     char *output_path;
     char *compiler_flags;
     char *linker_flags;
+    
+    char *run_string;
 } First;
 
 First first = {};
-
-void
-copy(char *a, char *b)
-{
-    for (int x = 0; (a[x] = b[x]); ++x);
-}
-
-int
-slen(char *str)
-{
-    int x;
-    for (x = 0; str[x] != '\0'; ++x);
-    return x;
-}
-
-void
-concat(char* str1, char* str2)
-{
-    char *ptr = &str1[slen(str1)];
-    copy(ptr, str2);
-}
 
 int scmp(char *a, char *b)
 {
@@ -50,30 +20,54 @@ int scmp(char *a, char *b)
     return 0;
 }
 
-void
-BuildProgram()
+int slen(char *str)
 {
-    char *run_string = (char *) malloc(256);
+    int x;
+    for (x = 0; str[x]; ++x);
+    return x;
+}
 
-    copy(run_string, "cd ../build && ");
-    concat(run_string, "cl ");
+void copy(char *here, char *this)
+{
+    for (int x = 0; (here[x] = this[x]); ++x);
+}
+
+void copy_right(char *str1, char *str2)
+{
+    char *ptr = &str1[slen(str1)];
+    copy(ptr, str2);
+}
+
+void copy_left(char *here, char *this)
+{
+    char *tmp = malloc(sizeof(here));
+    copy(tmp, here);
+    copy(here, this);
+    copy_right(here, tmp);
+    free(tmp);
+}
+
+void build_program()
+{
+    first.run_string = (char *) malloc(256);
+
+    copy(first.run_string, "cl ");
     if (slen(first.compiler_flags)) {
-	concat(run_string, first.compiler_flags);
-	concat(run_string, " ");
+	copy_right(first.run_string, first.compiler_flags);
+	copy_right(first.run_string, " ");
     }
-    concat(run_string, first.input_path);
+    copy_right(first.run_string, first.input_path);
     if (slen(first.linker_flags)) {
-	concat(run_string, " /link ");
-	concat(run_string, first.linker_flags);
+	copy_right(first.run_string, " /link ");
+	copy_right(first.run_string, first.linker_flags);
     }
-    concat(run_string, " /out:");
-    concat(run_string, first.output_path);
+    copy_right(first.run_string, " /out:");
+    copy_right(first.run_string, first.output_path);
     if (first.run_flag) {
-	concat(run_string, " && ");
-	concat(run_string, first.output_path);
+	copy_right(first.run_string, " && ");
+	copy_right(first.run_string, first.output_path);
     }
-    concat(run_string, " && cd ../code");
 
-    system(run_string);
-    free(run_string);
+    system(first.run_string);
+    free(first.run_string);
 }
